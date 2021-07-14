@@ -11,13 +11,16 @@
     <canvas width="50%" id="grayImage"></canvas>
     <div style="text-align: center;margin-top: 50px;">
         <button  onclick="copyText()" type="button" style="width: 200px; height: 30px;">图片转换成灰度图</button>
-        <button type="button" style="width: 200px; height: 30px;">保存</button>
+        <button onclick="downImg()" type="button" style="width: 200px; height: 30px;">保存</button>
     </div>
     <script>
         function copyText() {
             var iCanvas = document.getElementById("grayImage");//canvas element
             var imgToGray = new imageToGray(iCanvas, "../images/lufei.jpg");
             imgToGray.render();
+        };
+        function downImg() {
+            downloadCanvasIamge('canvas');
         };
     </script>
     <script src="index.js"></script>

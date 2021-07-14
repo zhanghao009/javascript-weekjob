@@ -69,4 +69,16 @@ function cvtColor(_src) {
     return dst;
 }
 
+function downloadCanvasIamge(selector) {
+    var dataImg = new Image();
+    var canvas = document.querySelector(selector)
+    dataImg.src = canvas.toDataURL("image/jpg");
+    document.body.appendChild(dataImg);
+    var alink = document.createElement("a");
+    alink.href = dataImg.src;
+    alink.download = "screenshot";
+    document.body.appendChild(alink);
+    alink.click();
+}
+
 window.imageToGray = imageToGray;
