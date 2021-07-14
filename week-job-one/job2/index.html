@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <img src="../images/lufei.jpg" alt="" width="50%">
+    <canvas width="50%" id="grayImage"></canvas>
+    <div style="text-align: center;margin-top: 50px;">
+        <button  onclick="copyText()" type="button" style="width: 200px; height: 30px;">图片转换成灰度图</button>
+        <button type="button" style="width: 200px; height: 30px;">保存</button>
+    </div>
+    <script>
+        function copyText() {
+            var iCanvas = document.getElementById("grayImage");//canvas element
+            var imgToGray = new imageToGray(iCanvas, "../images/lufei.jpg");
+            imgToGray.render();
+        };
+    </script>
+    <script src="index.js"></script>
+</body>
+</html>
