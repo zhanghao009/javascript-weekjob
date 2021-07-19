@@ -30,6 +30,7 @@ imageToGray.prototype = {
     render: function () {
         var img = new Image();
         var _this = this;
+        img.crossOrigin = '';
         img.onload = function () {
             var myMat = _this.imread(img);
             var newImage = cvtColor(myMat);
