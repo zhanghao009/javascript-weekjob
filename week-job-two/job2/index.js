@@ -1,5 +1,3 @@
-// import Engine from "./engine";
-
 const tmp = `<div class="newslist">
     <div class="img" v-if="info.showImage"><img src="{{image}}"/></div>
     <div class="date" v-if="info.showDate">{{info.name}}</div>
@@ -7,7 +5,7 @@ const tmp = `<div class="newslist">
 </div>`;
 
 const data = {
-    image: "some img",
+    image: "https://c-ssl.duitang.com/uploads/item/201511/21/20151121142243_hJ824.jpeg",
     info: {
         showImage: true,
         showDate:false,
@@ -37,15 +35,15 @@ class Vnode {
 }
 
 function render(template, data) {
-    const re1 = /<(\w+)(\W)\s*([^>]*)>([^<]*)<\/\1>/gm; //匹配<div class="a">XXX</div>
+    const re1 = /<(\w+)\s*([^>\s]*)\s*([^>]*)>([^<]*)<\/\1>/gm; //匹配<div class="a">XXX</div>
     const re2 = /<(\w+)\s*([^(/>)]*)\/>/gm; //匹配<img src="a"/>
     template = template.replace(/\n/gm, "");
     while (re1.test(template) || re2.test(template)) {
       //<div class="a">XXX</div>类型
-      template = template.replace(re1, (s0, s1, s2, s3) => {
+      template = template.replace(re1, (s0, s1, s2, s3, s4) => {
         let attr = this.parseAttribute(s2);
-        // let children = this.parseAttribute(s3);
-        let node = new Vnode(s1, attr, [], null, s3);
+        let children = this.parseAttribute(s3);
+        let node = new Vnode(s1, attr, children, null, s4);
         nodes.set(node.uuid, node);
         return `(${node.uuid})`;
       });
@@ -73,7 +71,7 @@ function parseToNode(template) {
     //转成成node节点
     while (stack.length > 0) {
       let pnode = stack.pop();
-      let nodestr = pnode.childrenTemplate.trim();
+      let nodestr = pnode.childrenTemplate && pnode.childrenTemplate.trim() || '';
       re.lastIndex = 0;
       [...nodestr.matchAll(re)].forEach((item) => {
         let n = nodes.get(item[1]);
