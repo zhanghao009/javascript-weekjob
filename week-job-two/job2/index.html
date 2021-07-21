@@ -11,8 +11,10 @@
 </body>
 <script src='./index.js'></script>
 <script>
-    let domStr = render(tmp, data);
-    let dom = document.getElementById("app");
-    dom.innerHTML = domStr;
+    (function () {
+        let domStr = render(tmp, data);
+        let dom = document.getElementById("app");
+        dom.appendChild(domStr);
+    })()
 </script>
 </html>

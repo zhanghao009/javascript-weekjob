@@ -1,43 +1,12 @@
-// import Engine from "./engine";
+import Vnode from "./vnode.js";
 
-const tmp = `<div class="newslist">
-    <div class="img" v-if="info.showImage"><img src="{{image}}"/></div>
-    <div class="date" v-if="info.showDate">{{info.name}}</div>
-    <div class="img">{{info.name}}</div>
-</div>`;
+export default class Engine {
+  constructor() {
+    this.nodes = new Map();
+  }
 
-const data = {
-    image: "some img",
-    info: {
-        showImage: true,
-        showDate:false,
-        name: "aaa"
-    }
-};
-
-let nodes = new Map();
-
-class Vnode {
-    constructor(tag, attr, children, parent, childrenTemplate) {
-      this.tag = tag;
-      this.attr = attr;
-      this.children = children;
-      this.parent = parent;
-      this.childrenTemplate = childrenTemplate;
-      this.uuid = this.uuid();
-    }
-  
-    uuid() {
-      return (
-        Math.random() * 10000000000 +
-        Math.random() * 100000 +
-        Date.now()
-      ).toString(36);
-    }
-}
-
-function render(template, data) {
-    const re1 = /<(\w+)(\W)\s*([^>]*)>([^<]*)<\/\1>/gm; //匹配<div class="a">XXX</div>
+  render(template, data) {
+    const re1 = /<(\w+)\s*([^>]*)>([^<]*)<\/\1>/gm; //匹配<div class="a">XXX</div>
     const re2 = /<(\w+)\s*([^(/>)]*)\/>/gm; //匹配<img src="a"/>
     template = template.replace(/\n/gm, "");
     while (re1.test(template) || re2.test(template)) {
@@ -46,26 +15,26 @@ function render(template, data) {
         let attr = this.parseAttribute(s2);
         // let children = this.parseAttribute(s3);
         let node = new Vnode(s1, attr, [], null, s3);
-        nodes.set(node.uuid, node);
+        this.nodes.set(node.uuid, node);
         return `(${node.uuid})`;
       });
       //<img src="a"/>类型
       template = template.replace(re2, (s0, s1, s2) => {
         let attr = this.parseAttribute(s2);
         let node = new Vnode(s1, attr, [], null, "");
-        nodes.set(node.uuid, node);
+        this.nodes.set(node.uuid, node);
         return `(${node.uuid})`;
       });
     }
-    console.log("第一阶段|解析创建node>>>", nodes);
+    console.log("第一阶段|解析创建node>>>", this.nodes);
     let rootNode = this.parseToNode(template);
     console.log("第二阶段|构建nodeTree>>>", rootNode);
     let dom = this.parseNodeToDom(rootNode, data);
     console.log("第三阶段|nodeTree To DomTree>>>", dom);
     return dom;
-}
+  }
 
-function parseToNode(template) {
+  parseToNode(template) {
     let re = /\((.*?)\)/g;
     let stack = [];
     let parent = new Vnode("root", {}, [], null, template, null);
@@ -76,7 +45,7 @@ function parseToNode(template) {
       let nodestr = pnode.childrenTemplate.trim();
       re.lastIndex = 0;
       [...nodestr.matchAll(re)].forEach((item) => {
-        let n = nodes.get(item[1]);
+        let n = this.nodes.get(item[1]);
         let newn = new Vnode(
           n.tag,
           n.attr,
@@ -90,9 +59,9 @@ function parseToNode(template) {
       });
     }
     return parent.children[0];
-}
+  }
 
-function parseNodeToDom(root, data) {
+  parseNodeToDom(root, data) {
     let fragment = document.createDocumentFragment();
     let stack = [[root, fragment, data]];
     //转成成node节点
@@ -132,9 +101,9 @@ function parseNodeToDom(root, data) {
       }
     }
     return fragment;
-}
+  }
 
-function scopehtmlParse(node, globalScope, curentScope) {
+  scopehtmlParse(node, globalScope, curentScope) {
     return node.childrenTemplate.replace(/\{\{(.*?)\}\}/g, (s0, s1) => {
       let props = s1.split(".");
       let val = curentScope[props[0]] || globalScope[props[0]];
@@ -143,9 +112,9 @@ function scopehtmlParse(node, globalScope, curentScope) {
       });
       return val;
     });
-}
+  }
 
-function scopeAtrrParse(ele, node, globalScope, curentScope) {
+  scopeAtrrParse(ele, node, globalScope, curentScope) {
     console.log(node.attr);
     for (let [key, value] of node.attr) {
       let result = /\{\{(.*?)\}\}/.exec(value);
@@ -158,9 +127,9 @@ function scopeAtrrParse(ele, node, globalScope, curentScope) {
         ele.setAttribute(key, val);
       }
     }
-}
+  }
 
-function createElement(node, html) {
+  createElement(node, html) {
     let ignoreAttr = ["for", "click"];
     let dom = document.createElement(node.tag);
     for (let [key, val] of node.attr) {
@@ -172,9 +141,9 @@ function createElement(node, html) {
       dom.innerHTML = html;
     }
     return dom;
-}
+  }
 
-function parseAttribute(str) {
+  parseAttribute(str) {
     let attr = new Map();
     str = str.trim();
     str.replace(/(\w+)\s*=['"](.*?)['"]/gm, (s0, s1, s2) => {
@@ -182,9 +151,9 @@ function parseAttribute(str) {
       return s0;
     });
     return attr;
-}
+  }
 
-function parseChildren(str) {
+  parseChildren(str) {
     str.replace(/\{\{(.*?)\}\}/gm, () => {});
+  }
 }
-  
