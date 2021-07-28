@@ -42,8 +42,8 @@ function render(template, data) {
       //<div class="a">XXX</div>类型
       template = template.replace(re1, (s0, s1, s2, s3, s4) => {
         let attr = this.parseAttribute(s2);
-        let children = this.parseAttribute(s3);
-        let node = new Vnode(s1, attr, children, null, s4);
+        let judge = this.parseAttribute(s3);
+        let node = new Vnode(s1, attr, judge, null, s4);
         nodes.set(node.uuid, node);
         return `(${node.uuid})`;
       });
@@ -133,7 +133,7 @@ function parseNodeToDom(root, data) {
 }
 
 function scopehtmlParse(node, globalScope, curentScope) {
-    return node.childrenTemplate.replace(/\{\{(.*?)\}\}/g, (s0, s1) => {
+    return node.childrenTemplate.replace(/\{\{(.*?)\}\}/g, (s0, s1, s2) => {
       let props = s1.split(".");
       let val = curentScope[props[0]] || globalScope[props[0]];
       props.slice(1).forEach((item) => {
